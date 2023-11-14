@@ -38,10 +38,19 @@ enum TrackType {
 }
 
 /// Color information label type.
-enum ColorLabelType { hex, rgb, hsv, hsl }
+enum ColorLabelType {
+  hex,
+  rgb,
+  hsv,
+  hsl
+}
 
 /// Types for slider picker widget.
-enum ColorModel { rgb, hsv, hsl }
+enum ColorModel {
+  rgb,
+  hsv,
+  hsl
+}
 // enum ColorSpace { rgb, hsv, hsl, hsp, okhsv, okhsl, xyz, yuv, lab, lch, cmyk }
 
 /// Painter for SV mixture.
@@ -57,7 +66,10 @@ class HSVWithHueColorPainter extends CustomPainter {
     const Gradient gradientV = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Colors.white, Colors.black],
+      colors: [
+        Colors.white,
+        Colors.black
+      ],
     );
     final Gradient gradientH = LinearGradient(
       colors: [
@@ -100,7 +112,10 @@ class HSVWithSaturationColorPainter extends CustomPainter {
     const Gradient gradientV = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Colors.transparent, Colors.black],
+      colors: [
+        Colors.transparent,
+        Colors.black
+      ],
     );
     final List<Color> colors = [
       HSVColor.fromAHSV(1.0, 0.0, hsvColor.saturation, 1.0).toColor(),
@@ -145,7 +160,10 @@ class HSVWithValueColorPainter extends CustomPainter {
     const Gradient gradientV = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Colors.transparent, Colors.white],
+      colors: [
+        Colors.transparent,
+        Colors.white
+      ],
     );
     final List<Color> colors = [
       const HSVColor.fromAHSV(1.0, 0.0, 1.0, 1.0).toColor(),
@@ -200,7 +218,12 @@ class HSLWithHueColorPainter extends CustomPainter {
     const Gradient gradientV = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      stops: [0.0, 0.5, 0.5, 1],
+      stops: [
+        0.0,
+        0.5,
+        0.5,
+        1
+      ],
       colors: [
         Colors.white,
         Color(0x00ffffff),
@@ -248,7 +271,12 @@ class HSLWithSaturationColorPainter extends CustomPainter {
     const Gradient gradientV = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      stops: [0.0, 0.5, 0.5, 1],
+      stops: [
+        0.0,
+        0.5,
+        0.5,
+        1
+      ],
       colors: [
         Colors.white,
         Color(0x00ffffff),
@@ -813,7 +841,11 @@ class ColorPickerLabel extends StatefulWidget {
     this.hsvColor, {
     Key? key,
     this.enableAlpha = true,
-    this.colorLabelTypes = const [ColorLabelType.rgb, ColorLabelType.hsv, ColorLabelType.hsl],
+    this.colorLabelTypes = const [
+      ColorLabelType.rgb,
+      ColorLabelType.hsv,
+      ColorLabelType.hsl
+    ],
     this.textStyle,
   })  : assert(colorLabelTypes.length > 0),
         super(key: key);
@@ -829,10 +861,30 @@ class ColorPickerLabel extends StatefulWidget {
 
 class _ColorPickerLabelState extends State<ColorPickerLabel> {
   final Map<ColorLabelType, List<String>> _colorTypes = const {
-    ColorLabelType.hex: ['R', 'G', 'B', 'A'],
-    ColorLabelType.rgb: ['R', 'G', 'B', 'A'],
-    ColorLabelType.hsv: ['H', 'S', 'V', 'A'],
-    ColorLabelType.hsl: ['H', 'S', 'L', 'A'],
+    ColorLabelType.hex: [
+      'R',
+      'G',
+      'B',
+      'A'
+    ],
+    ColorLabelType.rgb: [
+      'R',
+      'G',
+      'B',
+      'A'
+    ],
+    ColorLabelType.hsv: [
+      'H',
+      'S',
+      'V',
+      'A'
+    ],
+    ColorLabelType.hsl: [
+      'H',
+      'S',
+      'L',
+      'A'
+    ],
   };
 
   late ColorLabelType _colorType;
@@ -876,7 +928,12 @@ class _ColorPickerLabelState extends State<ColorPickerLabel> {
         '${(hsvColor.alpha * 100).round()}%',
       ];
     } else {
-      return ['??', '??', '??', '??'];
+      return [
+        '??',
+        '??',
+        '??',
+        '??'
+      ];
     }
   }
 
@@ -970,11 +1027,7 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
   @override
   Widget build(BuildContext context) {
     if (inputColor != widget.color.value) {
-      textEditingController.text = '#' +
-          widget.color.red.toRadixString(16).toUpperCase().padLeft(2, '0') +
-          widget.color.green.toRadixString(16).toUpperCase().padLeft(2, '0') +
-          widget.color.blue.toRadixString(16).toUpperCase().padLeft(2, '0') +
-          (widget.enableAlpha ? widget.color.alpha.toRadixString(16).toUpperCase().padLeft(2, '0') : '');
+      textEditingController.text = '#' + widget.color.red.toRadixString(16).toUpperCase().padLeft(2, '0') + widget.color.green.toRadixString(16).toUpperCase().padLeft(2, '0') + widget.color.blue.toRadixString(16).toUpperCase().padLeft(2, '0') + (widget.enableAlpha ? widget.color.alpha.toRadixString(16).toUpperCase().padLeft(2, '0') : '');
     }
     return Padding(
       padding: const EdgeInsets.only(top: 5.0),
@@ -1115,13 +1168,23 @@ class ColorPickerSlider extends StatelessWidget {
         children: <Widget>[
           LayoutId(
             id: _SliderLayout.track,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(50.0)),
-              child: CustomPaint(
-                  painter: TrackPainter(
-                trackType,
-                hsvColor,
-              )),
+            child: Container(
+              // decoration: BoxDecoration(
+              //   borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+              //   border: Border.all(
+              //     color: Color(0XFF0E0E0E),
+              //     width: 4.0, // Set your desired border width here
+              //     strokeAlign: BorderSide.strokeAlignOutside,
+              //   ),
+              // ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+                child: CustomPaint(
+                    painter: TrackPainter(
+                  trackType,
+                  hsvColor,
+                )),
+              ),
             ),
           ),
           LayoutId(
@@ -1142,10 +1205,8 @@ class ColorPickerSlider extends StatelessWidget {
               builder: (BuildContext context, BoxConstraints box) {
                 RenderBox? getBox = context.findRenderObject() as RenderBox?;
                 return GestureDetector(
-                  onPanDown: (DragDownDetails details) =>
-                      getBox != null ? slideEvent(getBox, box, details.globalPosition) : null,
-                  onPanUpdate: (DragUpdateDetails details) =>
-                      getBox != null ? slideEvent(getBox, box, details.globalPosition) : null,
+                  onPanDown: (DragDownDetails details) => getBox != null ? slideEvent(getBox, box, details.globalPosition) : null,
+                  onPanUpdate: (DragUpdateDetails details) => getBox != null ? slideEvent(getBox, box, details.globalPosition) : null,
                 );
               },
             ),
@@ -1395,6 +1456,5 @@ class _AlwaysWinPanGestureRecognizer extends PanGestureRecognizer {
 /// Uppercase text formater
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(oldValue, TextEditingValue newValue) =>
-      TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection);
+  TextEditingValue formatEditUpdate(oldValue, TextEditingValue newValue) => TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection);
 }

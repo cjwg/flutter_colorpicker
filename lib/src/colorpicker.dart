@@ -7,6 +7,7 @@ library hsv_picker;
 import 'package:flutter/material.dart';
 import 'palette.dart';
 import 'utils.dart';
+import 'dart:math' as math;
 
 /// The default layout of Color Picker.
 class ColorPicker extends StatefulWidget {
@@ -19,7 +20,11 @@ class ColorPicker extends StatefulWidget {
     this.paletteType = PaletteType.hsvWithHue,
     this.enableAlpha = true,
     @Deprecated('Use empty list in [labelTypes] to disable label.') this.showLabel = true,
-    this.labelTypes = const [ColorLabelType.rgb, ColorLabelType.hsv, ColorLabelType.hsl],
+    this.labelTypes = const [
+      ColorLabelType.rgb,
+      ColorLabelType.hsv,
+      ColorLabelType.hsl
+    ],
     @Deprecated('Use Theme.of(context).textTheme.bodyText1 & 2 to alter text style.') this.labelTextStyle,
     this.displayThumbColor = false,
     this.portraitOnly = false,
@@ -166,8 +171,7 @@ class _ColorPickerState extends State<ColorPicker> {
 
   @override
   void initState() {
-    currentHsvColor =
-        (widget.pickerHsvColor != null) ? widget.pickerHsvColor as HSVColor : HSVColor.fromColor(widget.pickerColor);
+    currentHsvColor = (widget.pickerHsvColor != null) ? widget.pickerHsvColor as HSVColor : HSVColor.fromColor(widget.pickerColor);
     // If there's no initial text in `hexInputController`,
     if (widget.hexInputController?.text.isEmpty == true) {
       // set it to the current's color HEX value.
@@ -187,8 +191,7 @@ class _ColorPickerState extends State<ColorPicker> {
   @override
   void didUpdateWidget(ColorPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    currentHsvColor =
-        (widget.pickerHsvColor != null) ? widget.pickerHsvColor as HSVColor : HSVColor.fromColor(widget.pickerColor);
+    currentHsvColor = (widget.pickerHsvColor != null) ? widget.pickerHsvColor as HSVColor : HSVColor.fromColor(widget.pickerColor);
   }
 
   void colorPickerTextInputListener() {
@@ -238,10 +241,11 @@ class _ColorPickerState extends State<ColorPicker> {
   }
 
   Widget colorPicker() {
-    return ClipRRect(
-      borderRadius: widget.pickerAreaBorderRadius,
-      child: Padding(
-        padding: EdgeInsets.all(widget.paletteType == PaletteType.hueWheel ? 10 : 0),
+    return Container(
+      // padding: EdgeInsets.all(4),
+      // decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(24)), color: Color(0XFF0E0E0E)),
+      child: ClipRRect(
+        borderRadius: widget.pickerAreaBorderRadius, // Ensures content is clipped to the border radius
         child: ColorPickerArea(currentHsvColor, onColorChanging, widget.paletteType),
       ),
     );
@@ -276,169 +280,19 @@ class _ColorPickerState extends State<ColorPicker> {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).orientation == Orientation.portrait || widget.portraitOnly) {
-      return Column(
-        children: <Widget>[
-          SizedBox(
-            width: widget.colorPickerWidth,
-            height: widget.colorPickerWidth * widget.pickerAreaHeightPercent,
-            child: colorPicker(),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15.0, 5.0, 10.0, 5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () => setState(() {
-                    if (widget.onHistoryChanged != null && !colorHistory.contains(currentHsvColor.toColor())) {
-                      colorHistory.add(currentHsvColor.toColor());
-                      widget.onHistoryChanged!(colorHistory);
-                    }
-                  }),
-                  child: ColorIndicator(currentHsvColor),
-                ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 40.0, width: widget.colorPickerWidth - 75.0, child: sliderByPaletteType()),
-                      if (widget.enableAlpha)
-                        SizedBox(
-                          height: 40.0,
-                          width: widget.colorPickerWidth - 75.0,
-                          child: colorPickerSlider(TrackType.alpha),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (colorHistory.isNotEmpty)
-            SizedBox(
-              width: widget.colorPickerWidth,
-              height: 50,
-              child: ListView(scrollDirection: Axis.horizontal, children: <Widget>[
-                for (Color color in colorHistory)
-                  Padding(
-                    key: Key(color.hashCode.toString()),
-                    padding: const EdgeInsets.fromLTRB(15, 0, 0, 10),
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: () => onColorChanging(HSVColor.fromColor(color)),
-                        child: ColorIndicator(HSVColor.fromColor(color), width: 30, height: 30),
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 15),
-              ]),
-            ),
-          if (widget.showLabel && widget.labelTypes.isNotEmpty)
-            FittedBox(
-              child: ColorPickerLabel(
-                currentHsvColor,
-                enableAlpha: widget.enableAlpha,
-                textStyle: widget.labelTextStyle,
-                colorLabelTypes: widget.labelTypes,
-              ),
-            ),
-          if (widget.hexInputBar)
-            ColorPickerInput(
-              currentHsvColor.toColor(),
-              (Color color) {
-                setState(() => currentHsvColor = HSVColor.fromColor(color));
-                widget.onColorChanged(currentHsvColor.toColor());
-                if (widget.onHsvColorChanged != null) widget.onHsvColorChanged!(currentHsvColor);
-              },
-              enableAlpha: widget.enableAlpha,
-              embeddedText: false,
-            ),
-          const SizedBox(height: 20.0),
-        ],
-      );
-    } else {
-      return Row(
-        children: <Widget>[
-          SizedBox(
-              width: widget.colorPickerWidth,
-              height: widget.colorPickerWidth * widget.pickerAreaHeightPercent,
-              child: colorPicker()),
-          Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  const SizedBox(width: 20.0),
-                  GestureDetector(
-                    onTap: () => setState(() {
-                      if (widget.onHistoryChanged != null && !colorHistory.contains(currentHsvColor.toColor())) {
-                        colorHistory.add(currentHsvColor.toColor());
-                        widget.onHistoryChanged!(colorHistory);
-                      }
-                    }),
-                    child: ColorIndicator(currentHsvColor),
-                  ),
-                  Column(
-                    children: <Widget>[
-                      SizedBox(height: 40.0, width: 260.0, child: sliderByPaletteType()),
-                      if (widget.enableAlpha)
-                        SizedBox(height: 40.0, width: 260.0, child: colorPickerSlider(TrackType.alpha)),
-                    ],
-                  ),
-                  const SizedBox(width: 10.0),
-                ],
-              ),
-              if (colorHistory.isNotEmpty)
-                SizedBox(
-                  width: widget.colorPickerWidth,
-                  height: 50,
-                  child: ListView(scrollDirection: Axis.horizontal, children: <Widget>[
-                    for (Color color in colorHistory)
-                      Padding(
-                        key: Key(color.hashCode.toString()),
-                        padding: const EdgeInsets.fromLTRB(15, 18, 0, 0),
-                        child: Center(
-                          child: GestureDetector(
-                            onTap: () => onColorChanging(HSVColor.fromColor(color)),
-                            onLongPress: () {
-                              if (colorHistory.remove(color)) {
-                                widget.onHistoryChanged!(colorHistory);
-                                setState(() {});
-                              }
-                            },
-                            child: ColorIndicator(HSVColor.fromColor(color), width: 30, height: 30),
-                          ),
-                        ),
-                      ),
-                    const SizedBox(width: 15),
-                  ]),
-                ),
-              const SizedBox(height: 20.0),
-              if (widget.showLabel && widget.labelTypes.isNotEmpty)
-                FittedBox(
-                  child: ColorPickerLabel(
-                    currentHsvColor,
-                    enableAlpha: widget.enableAlpha,
-                    textStyle: widget.labelTextStyle,
-                    colorLabelTypes: widget.labelTypes,
-                  ),
-                ),
-              if (widget.hexInputBar)
-                ColorPickerInput(
-                  currentHsvColor.toColor(),
-                  (Color color) {
-                    setState(() => currentHsvColor = HSVColor.fromColor(color));
-                    widget.onColorChanged(currentHsvColor.toColor());
-                    if (widget.onHsvColorChanged != null) widget.onHsvColorChanged!(currentHsvColor);
-                  },
-                  enableAlpha: widget.enableAlpha,
-                  embeddedText: false,
-                ),
-              const SizedBox(height: 5),
-            ],
-          ),
-        ],
-      );
-    }
+    return Row(children: [
+      SizedBox(
+        width: widget.colorPickerWidth,
+        height: widget.colorPickerWidth * widget.pickerAreaHeightPercent,
+        child: colorPicker(),
+      ),
+      RotatedBox(
+        quarterTurns: 1,
+        child: Container(
+          child: SizedBox(height: 50.0, width: widget.colorPickerWidth * widget.pickerAreaHeightPercent, child: sliderByPaletteType()),
+        ),
+      ),
+    ]);
   }
 }
 
@@ -538,7 +392,12 @@ class _SlidePickerState extends State<SlidePicker> {
               ],
               begin: widget.indicatorAlignmentBegin,
               end: widget.indicatorAlignmentEnd,
-              stops: const [0.0, 0.5, 0.5, 1.0],
+              stops: const [
+                0.0,
+                0.5,
+                0.5,
+                1.0
+              ],
             ),
           ),
           child: const CustomPaint(painter: CheckerPainter()),
@@ -584,10 +443,24 @@ class _SlidePickerState extends State<SlidePicker> {
       fontSize = widget.labelTextStyle?.fontSize ?? 14;
     }
     final List<TrackType> trackTypes = [
-      if (widget.colorModel == ColorModel.hsv) ...[TrackType.hue, TrackType.saturation, TrackType.value],
-      if (widget.colorModel == ColorModel.hsl) ...[TrackType.hue, TrackType.saturationForHSL, TrackType.lightness],
-      if (widget.colorModel == ColorModel.rgb) ...[TrackType.red, TrackType.green, TrackType.blue],
-      if (widget.enableAlpha) ...[TrackType.alpha],
+      if (widget.colorModel == ColorModel.hsv) ...[
+        TrackType.hue,
+        TrackType.saturation,
+        TrackType.value
+      ],
+      if (widget.colorModel == ColorModel.hsl) ...[
+        TrackType.hue,
+        TrackType.saturationForHSL,
+        TrackType.lightness
+      ],
+      if (widget.colorModel == ColorModel.rgb) ...[
+        TrackType.red,
+        TrackType.green,
+        TrackType.blue
+      ],
+      if (widget.enableAlpha) ...[
+        TrackType.alpha
+      ],
     ];
     List<SizedBox> sliders = [
       for (TrackType trackType in trackTypes)
